@@ -1,0 +1,1365 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXORA — Будущее уже здесь</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #080808;
+    --white: #F5F0E8;
+    --acid: #C8FF00;
+    --rust: #E84B1A;
+    --dim: #1A1A1A;
+    --mid: #333;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* CURSOR */
+  .cursor {
+    width: 12px; height: 12px;
+    background: var(--acid);
+    border-radius: 50%;
+    position: fixed;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s, width 0.3s, height 0.3s, background 0.3s;
+    mix-blend-mode: difference;
+  }
+  .cursor.hover { width: 40px; height: 40px; background: var(--acid); }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 28px 60px;
+    mix-blend-mode: difference;
+  }
+  .logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+  nav ul { list-style: none; display: flex; gap: 40px; }
+  nav a {
+    color: var(--white); text-decoration: none;
+    font-size: 13px; letter-spacing: 2px; text-transform: uppercase;
+    opacity: 0.6; transition: opacity 0.3s;
+  }
+  nav a:hover { opacity: 1; }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: grid;
+    grid-template-rows: 1fr auto;
+    padding: 160px 60px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-bg {
+    position: absolute; inset: 0; z-index: 0;
+    background:
+      radial-gradient(ellipse 80% 60% at 70% 40%, rgba(200,255,0,0.06) 0%, transparent 60%),
+      radial-gradient(ellipse 40% 40% at 10% 80%, rgba(232,75,26,0.08) 0%, transparent 50%);
+  }
+
+  .noise {
+    position: absolute; inset: 0; z-index: 1; opacity: 0.04;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    background-size: 256px;
+  }
+
+  .hero-content { position: relative; z-index: 2; }
+
+  .hero-tag {
+    display: inline-flex; align-items: center; gap: 10px;
+    border: 1px solid rgba(200,255,0,0.3);
+    padding: 8px 18px; border-radius: 2px;
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--acid); margin-bottom: 48px;
+    animation: fadeIn 1s ease both;
+  }
+  .dot { width: 6px; height: 6px; background: var(--acid); border-radius: 50%; animation: pulse 2s infinite; }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  h1 {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 14vw, 200px);
+    line-height: 0.88;
+    letter-spacing: -2px;
+    animation: slideUp 1s ease 0.2s both;
+  }
+
+  h1 em {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    color: var(--acid);
+  }
+
+  .hero-sub {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-top: 60px;
+    animation: fadeIn 1s ease 0.6s both;
+  }
+
+  .hero-desc {
+    max-width: 420px;
+    font-size: 16px; line-height: 1.7;
+    color: rgba(245,240,232,0.6);
+  }
+
+  .hero-cta {
+    display: flex; flex-direction: column; align-items: flex-end; gap: 16px;
+  }
+
+  .btn-primary {
+    background: var(--acid);
+    color: var(--black);
+    padding: 18px 48px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    border: none; cursor: none;
+    transition: transform 0.3s, box-shadow 0.3s;
+    position: relative; overflow: hidden;
+    text-decoration: none; display: inline-block;
+  }
+  .btn-primary::after {
+    content: ''; position: absolute; inset: 0;
+    background: var(--black); transform: translateX(-101%);
+    transition: transform 0.4s cubic-bezier(0.77,0,0.175,1);
+  }
+  .btn-primary:hover::after { transform: translateX(0); }
+  .btn-primary span { position: relative; z-index: 1; }
+  .btn-primary:hover span { color: var(--acid); }
+
+  .scroll-hint {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(245,240,232,0.3);
+  }
+
+  /* TICKER */
+  .ticker {
+    border-top: 1px solid var(--mid);
+    border-bottom: 1px solid var(--mid);
+    padding: 18px 0;
+    overflow: hidden;
+    background: var(--dim);
+  }
+  .ticker-track {
+    display: flex; gap: 80px;
+    width: max-content;
+    animation: ticker 20s linear infinite;
+  }
+  .ticker-item {
+    display: flex; align-items: center; gap: 20px;
+    font-size: 12px; letter-spacing: 3px; text-transform: uppercase;
+    color: rgba(245,240,232,0.4); white-space: nowrap;
+  }
+  .ticker-item b { color: var(--acid); font-weight: 500; }
+  .sep { color: var(--rust); font-size: 18px; }
+  @keyframes ticker { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+  /* STATS */
+  .stats {
+    display: grid; grid-template-columns: repeat(4, 1fr);
+    border-bottom: 1px solid var(--mid);
+  }
+  .stat-item {
+    padding: 80px 60px;
+    border-right: 1px solid var(--mid);
+    position: relative; overflow: hidden;
+  }
+  .stat-item:last-child { border-right: none; }
+  .stat-item::before {
+    content: ''; position: absolute;
+    top: 0; left: 0; right: 0; height: 2px;
+    background: var(--acid); transform: scaleX(0); transform-origin: left;
+    transition: transform 0.6s cubic-bezier(0.77,0,0.175,1);
+  }
+  .stat-item:hover::before { transform: scaleX(1); }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; line-height: 1;
+    color: var(--white);
+    display: block; margin-bottom: 8px;
+  }
+  .stat-unit { color: var(--acid); }
+  .stat-label {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(245,240,232,0.4);
+  }
+
+  /* ABOUT */
+  .about {
+    display: grid; grid-template-columns: 1fr 1fr;
+    min-height: 80vh;
+  }
+  .about-left {
+    background: var(--dim);
+    padding: 100px 60px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    border-right: 1px solid var(--mid);
+  }
+  .about-right {
+    padding: 100px 60px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .section-label {
+    font-size: 11px; letter-spacing: 4px; text-transform: uppercase;
+    color: rgba(245,240,232,0.3); margin-bottom: 40px;
+    display: flex; align-items: center; gap: 16px;
+  }
+  .section-label::before {
+    content: ''; display: block;
+    width: 30px; height: 1px; background: var(--acid);
+  }
+  .about-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 90px);
+    line-height: 0.9; letter-spacing: -1px;
+  }
+  .about-body {
+    font-size: 16px; line-height: 1.8;
+    color: rgba(245,240,232,0.6);
+    max-width: 480px;
+  }
+  .about-body + .about-body { margin-top: 20px; }
+
+  .big-quote {
+    font-family: 'Instrument Serif', serif;
+    font-style: italic;
+    font-size: clamp(32px, 4vw, 52px);
+    line-height: 1.2;
+    color: var(--white);
+  }
+  .big-quote em { color: var(--acid); font-style: normal; }
+
+  /* FEATURES */
+  .features { padding: 120px 60px; }
+  .features-header {
+    display: flex; justify-content: space-between; align-items: flex-end;
+    margin-bottom: 80px;
+    border-bottom: 1px solid var(--mid); padding-bottom: 40px;
+  }
+  .features-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 120px);
+    line-height: 0.9;
+  }
+  .features-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    background: var(--mid);
+  }
+  .feature-card {
+    background: var(--black);
+    padding: 60px 48px;
+    position: relative; overflow: hidden;
+    transition: background 0.4s;
+  }
+  .feature-card:hover { background: var(--dim); }
+  .feature-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px; line-height: 1;
+    color: rgba(245,240,232,0.05);
+    position: absolute; top: 20px; right: 30px;
+  }
+  .feature-icon {
+    width: 48px; height: 48px;
+    border: 1px solid var(--mid); border-radius: 2px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 32px; font-size: 22px;
+    transition: border-color 0.3s, background 0.3s;
+  }
+  .feature-card:hover .feature-icon {
+    border-color: var(--acid); background: rgba(200,255,0,0.08);
+  }
+  .feature-name {
+    font-size: 20px; font-weight: 500; margin-bottom: 16px;
+  }
+  .feature-desc {
+    font-size: 14px; line-height: 1.7;
+    color: rgba(245,240,232,0.5);
+  }
+
+  /* PRICING */
+  .pricing {
+    padding: 120px 60px;
+    background: var(--dim);
+    border-top: 1px solid var(--mid);
+  }
+  .pricing-header { text-align: center; margin-bottom: 80px; }
+  .pricing-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 8vw, 110px); line-height: 0.9;
+  }
+  .pricing-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 2px; background: var(--mid);
+    max-width: 1100px; margin: 0 auto;
+  }
+  .plan {
+    background: var(--black);
+    padding: 60px 48px;
+    position: relative;
+    transition: transform 0.3s;
+  }
+  .plan.featured {
+    background: var(--acid);
+    color: var(--black);
+  }
+  .plan-label {
+    font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+    opacity: 0.5; margin-bottom: 24px;
+  }
+  .plan.featured .plan-label { opacity: 0.7; }
+  .plan-price {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 72px; line-height: 1;
+    margin-bottom: 8px;
+  }
+  .plan-period { font-size: 13px; opacity: 0.5; margin-bottom: 40px; }
+  .plan-features { list-style: none; margin-bottom: 48px; }
+  .plan-features li {
+    padding: 12px 0; border-bottom: 1px solid rgba(245,240,232,0.1);
+    font-size: 14px; display: flex; gap: 12px; align-items: center;
+  }
+  .plan.featured .plan-features li { border-color: rgba(0,0,0,0.1); }
+  .plan-features li::before { content: '→'; color: var(--acid); font-weight: bold; }
+  .plan.featured .plan-features li::before { color: var(--black); }
+  .btn-plan {
+    display: block; text-align: center;
+    padding: 16px 32px; border: 1px solid currentColor;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    text-decoration: none; color: inherit;
+    transition: background 0.3s, color 0.3s;
+    cursor: none;
+  }
+  .btn-plan:hover { background: var(--white); color: var(--black); }
+  .plan.featured .btn-plan { border-color: var(--black); }
+  .plan.featured .btn-plan:hover { background: var(--black); color: var(--acid); }
+
+  /* FOUNDERS */
+  /* CTA SECTION */
+  .cta-section {
+    min-height: 60vh;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    text-align: center; padding: 120px 60px;
+    background: var(--black);
+    border-top: 1px solid var(--mid);
+    position: relative; overflow: hidden;
+  }
+  .cta-section::before {
+    content: '';
+    position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+    width: 800px; height: 800px;
+    background: radial-gradient(circle, rgba(200,255,0,0.04) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .cta-text {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(60px, 10vw, 140px);
+    line-height: 0.9;
+    position: relative; z-index: 1; margin-bottom: 40px;
+  }
+  .cta-text em { font-style: normal; color: var(--acid); }
+
+  /* WAITLIST FORM */
+  .waitlist-form {
+    position: relative; z-index: 1;
+    display: flex; gap: 0;
+    margin-top: 48px;
+    width: 100%; max-width: 520px;
+  }
+  .waitlist-input {
+    flex: 1;
+    background: var(--dim);
+    border: 1px solid var(--mid);
+    border-right: none;
+    padding: 18px 24px;
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  .waitlist-input::placeholder { color: rgba(245,240,232,0.3); }
+  .waitlist-input:focus { border-color: var(--acid); }
+  .waitlist-submit {
+    background: var(--acid);
+    color: var(--black);
+    border: none;
+    padding: 18px 32px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: none;
+    white-space: nowrap;
+    transition: opacity 0.3s;
+  }
+  .waitlist-submit:hover { opacity: 0.85; }
+  .waitlist-count {
+    margin-top: 16px;
+    font-size: 12px; letter-spacing: 1px;
+    color: rgba(245,240,232,0.4);
+    position: relative; z-index: 1;
+  }
+  .waitlist-count b { color: var(--acid); }
+  .waitlist-success {
+    display: none;
+    margin-top: 20px;
+    padding: 16px 32px;
+    border: 1px solid var(--acid);
+    color: var(--acid);
+    font-size: 14px; letter-spacing: 1px;
+    position: relative; z-index: 1;
+  }
+
+
+  /* FOOTER */
+  footer {
+    border-top: 1px solid var(--mid);
+    padding: 40px 60px;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .footer-copy { font-size: 12px; letter-spacing: 1px; color: rgba(245,240,232,0.3); }
+  .footer-links { display: flex; gap: 32px; }
+  .footer-links a {
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    color: rgba(245,240,232,0.3); text-decoration: none;
+    transition: color 0.3s;
+  }
+  .footer-links a:hover { color: var(--acid); }
+
+  /* ANIMATIONS */
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+
+  .reveal {
+    opacity: 0; transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+  .reveal.visible { opacity: 1; transform: none; }
+
+  @media (max-width: 900px) {
+    nav { padding: 20px 24px; }
+    nav ul { display: none; }
+    .hero { padding: 120px 24px 40px; }
+    .hero-sub { flex-direction: column; gap: 40px; align-items: flex-start; }
+    .hero-cta { align-items: flex-start; }
+    .stats { grid-template-columns: repeat(2, 1fr); }
+    .stat-item { padding: 48px 24px; border-bottom: 1px solid var(--mid); }
+    .about { grid-template-columns: 1fr; }
+    .about-left, .about-right { padding: 60px 24px; border-right: none; border-bottom: 1px solid var(--mid); }
+    .features { padding: 60px 24px; }
+    .pricing { padding: 60px 24px; }
+  .cta-section { padding: 80px 24px; }
+    footer { flex-direction: column; gap: 20px; padding: 30px 24px; }
+  }
+
+  /* ── AUTH MODAL ─────────────────────────────────────────── */
+  .auth-overlay {
+    position: fixed; inset: 0; z-index: 1000;
+    background: rgba(8,8,8,0.92);
+    backdrop-filter: blur(8px);
+    display: none; align-items: center; justify-content: center;
+  }
+  .auth-overlay.open { display: flex; }
+
+  .auth-modal {
+    width: 100%; max-width: 440px;
+    background: var(--dim);
+    border: 1px solid #2a2a2a;
+    padding: 48px;
+    position: relative;
+    animation: modalIn 0.35s cubic-bezier(0.22,1,0.36,1);
+  }
+  @keyframes modalIn {
+    from { opacity: 0; transform: translateY(24px) scale(0.97); }
+    to   { opacity: 1; transform: none; }
+  }
+
+  .auth-close {
+    position: absolute; top: 20px; right: 20px;
+    background: none; border: none; color: var(--text-dim, rgba(245,240,232,0.4));
+    font-size: 20px; cursor: pointer; line-height: 1;
+    transition: color 0.2s;
+  }
+  .auth-close:hover { color: var(--white); }
+
+  .auth-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 24px; letter-spacing: 3px; color: var(--acid);
+    margin-bottom: 8px;
+  }
+  .auth-tabs {
+    display: flex; gap: 0; margin-bottom: 32px;
+    border-bottom: 1px solid #2a2a2a;
+  }
+  .auth-tab {
+    padding: 10px 0; margin-right: 28px;
+    font-size: 13px; letter-spacing: 1px;
+    color: rgba(245,240,232,0.35);
+    background: none; border: none; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px; transition: color 0.2s;
+  }
+  .auth-tab.active { color: var(--white); border-bottom-color: var(--acid); }
+
+  .auth-field { margin-bottom: 16px; }
+  .auth-label {
+    display: block; font-size: 11px; letter-spacing: 2px;
+    text-transform: uppercase; color: rgba(245,240,232,0.4);
+    margin-bottom: 8px;
+  }
+  .auth-input {
+    width: 100%; background: #111;
+    border: 1px solid #2a2a2a;
+    padding: 14px 16px;
+    color: var(--white); font-family: 'DM Sans', sans-serif;
+    font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .auth-input:focus { border-color: var(--acid); }
+  .auth-input::placeholder { color: rgba(245,240,232,0.2); }
+
+  .auth-submit {
+    width: 100%; margin-top: 24px;
+    background: var(--acid); color: var(--black);
+    border: none; padding: 16px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px; font-weight: 500;
+    letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: opacity 0.2s;
+  }
+  .auth-submit:hover { opacity: 0.85; }
+  .auth-submit:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  .auth-msg {
+    margin-top: 16px; padding: 12px 16px;
+    font-size: 13px; text-align: center; display: none;
+  }
+  .auth-msg.error { border: 1px solid var(--rust); color: var(--rust); display: block; }
+  .auth-msg.success { border: 1px solid var(--acid); color: var(--acid); display: block; }
+
+  .auth-divider {
+    text-align: center; margin: 20px 0;
+    font-size: 11px; color: rgba(245,240,232,0.2);
+    letter-spacing: 2px;
+  }
+
+  /* Nav auth button */
+  .btn-nav-auth {
+    padding: 8px 20px;
+    border: 1px solid rgba(200,255,0,0.4);
+    color: var(--acid); background: transparent;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px; letter-spacing: 2px; text-transform: uppercase;
+    cursor: pointer; transition: background 0.2s, color 0.2s;
+  }
+  .btn-nav-auth:hover { background: var(--acid); color: var(--black); }
+
+  .nav-user {
+    display: flex; align-items: center; gap: 12px;
+    font-size: 12px; color: rgba(245,240,232,0.6);
+  }
+  .nav-user-email { letter-spacing: 0.5px; }
+  .btn-logout {
+    background: none; border: none;
+    color: rgba(245,240,232,0.3); font-size: 11px;
+    letter-spacing: 1px; cursor: pointer;
+    font-family: 'DM Sans', sans-serif;
+    text-transform: uppercase; transition: color 0.2s;
+  }
+  .btn-logout:hover { color: var(--rust); }
+
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+
+<nav>
+  <div class="logo">NEXORA</div>
+  <ul id="nav-links">
+    <li><a href="#about" data-ru="О нас" data-en="About">О нас</a></li>
+    <li><a href="#product" data-ru="Продукт" data-en="Product">Продукт</a></li>
+    <li><a href="#pricing" data-ru="Тарифы" data-en="Pricing">Тарифы</a></li>
+    
+  </ul>
+  
+
+  <div id="nav-auth-area"><button class="btn-nav-auth" onclick="openAuth('login')">Войти</button></div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="noise"></div>
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="dot"></span>
+      Открыт ранний доступ · 2026
+    </div>
+    <h1>Данные<br>которые<br><em>работают</em></h1>
+    <div class="hero-sub">
+      <p class="hero-desc">
+        NEXORA — AI-платформа для бизнеса, которая превращает хаос из Excel и CRM в живые инсайты за 30 секунд. Без дата-сайентистов. Без боли.
+      </p>
+      <div class="hero-cta">
+        <a href="#pricing" class="btn-primary"><span>Начать бесплатно →</span></a>
+        <span class="scroll-hint">↓ прокрути вниз</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track" id="ticker">
+    <div class="ticker-item"><b>+340%</b> рост выручки клиентов <span class="sep">✦</span></div>
+    <div class="ticker-item">Используют <b>180+</b> компаний <span class="sep">✦</span></div>
+    <div class="ticker-item">Данные готовы за <b>30 сек</b> <span class="sep">✦</span></div>
+    <div class="ticker-item">NPS Score <b>72</b> <span class="sep">✦</span></div>
+    <div class="ticker-item">Поднято <b>$2.4M</b> инвестиций <span class="sep">✦</span></div>
+    <div class="ticker-item"><b>+340%</b> рост выручки клиентов <span class="sep">✦</span></div>
+    <div class="ticker-item">Используют <b>180+</b> компаний <span class="sep">✦</span></div>
+    <div class="ticker-item">Данные готовы за <b>30 сек</b> <span class="sep">✦</span></div>
+    <div class="ticker-item">NPS Score <b>72</b> <span class="sep">✦</span></div>
+    <div class="ticker-item">Поднято <b>$2.4M</b> инвестиций <span class="sep">✦</span></div>
+  </div>
+</div>
+
+<!-- STATS -->
+<section class="stats">
+  <div class="stat-item reveal">
+    <span class="stat-num">180<span class="stat-unit">+</span></span>
+    <span class="stat-label">B2B клиентов</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">30<span class="stat-unit">с</span></span>
+    <span class="stat-label">до первого инсайта</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">2.4<span class="stat-unit">M$</span></span>
+    <span class="stat-label">привлечено инвестиций</span>
+  </div>
+  <div class="stat-item reveal">
+    <span class="stat-num">99<span class="stat-unit">%</span></span>
+    <span class="stat-label">uptime гарантия</span>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-left">
+    <div>
+      <div class="section-label">Проблема</div>
+      <h2 class="about-title reveal">Аналитика<br>убивает<br>время</h2>
+    </div>
+    <div class="about-body reveal">
+      Средний менеджер тратит 11 часов в неделю на сводные таблицы и отчёты. Это 25% рабочего времени — впустую.
+    </div>
+    <div class="about-body reveal">
+      Данные есть у всех. Понимать их — нет. NEXORA закрывает этот разрыв.
+    </div>
+  </div>
+  <div class="about-right" id="product">
+    <div class="section-label">Решение</div>
+    <p class="big-quote reveal">
+      Загрузи таблицу — получи <em>стратегию.</em> Спроси вопрос — получи ответ с графиком.
+    </p>
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="features">
+  <div class="features-header reveal">
+    <div class="section-label">Продукт</div>
+    <h2 class="features-title">Что<br>внутри</h2>
+  </div>
+  <div class="features-grid">
+    <div class="feature-card reveal">
+      <span class="feature-num">01</span>
+      <div class="feature-icon">🧠</div>
+      <div class="feature-name">AI-аналитик</div>
+      <p class="feature-desc">Задавай вопросы к данным на русском языке. Получай ответы с визуализацией за секунды, как у ChatGPT, но про твой бизнес.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-num">02</span>
+      <div class="feature-icon">⚡</div>
+      <div class="feature-name">Авто-дашборды</div>
+      <p class="feature-desc">Загрузи CSV или подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-num">03</span>
+      <div class="feature-icon">🔮</div>
+      <div class="feature-name">Прогнозирование</div>
+      <p class="feature-desc">ML-модели строят прогнозы продаж, оттока клиентов и спроса. Настраивается под твой рынок за один клик.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-num">04</span>
+      <div class="feature-icon">🔗</div>
+      <div class="feature-name">100+ интеграций</div>
+      <p class="feature-desc">Salesforce, HubSpot, Google Sheets, Postgres, Stripe — подключаем всё где живут твои данные. API за 15 минут.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-num">05</span>
+      <div class="feature-icon">🛡️</div>
+      <div class="feature-name">Безопасность</div>
+      <p class="feature-desc">Данные не покидают твой контур. Европейский дата-центр, GDPR, SOC2 в процессе. Enterprise-уровень для любого тарифа.</p>
+    </div>
+    <div class="feature-card reveal">
+      <span class="feature-num">06</span>
+      <div class="feature-icon">📊</div>
+      <div class="feature-name">Командная работа</div>
+      <p class="feature-desc">Шэри дашборды с командой, ставь задачи на инсайты, экспортируй PDF-отчёты с брендингом в один клик.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PRICING -->
+<section class="pricing" id="pricing">
+  <div class="pricing-header reveal">
+    <div class="section-label" style="justify-content:center; margin-bottom:16px;">Тарифы</div>
+    <h2 class="pricing-title">Цены<br>без сюрпризов</h2>
+  </div>
+  <div class="pricing-grid">
+    <div class="plan reveal">
+      <div class="plan-label">Старт</div>
+      <div class="plan-price">$0</div>
+      <div class="plan-period">/ навсегда бесплатно</div>
+      <ul class="plan-features">
+        <li>3 дашборда</li>
+        <li>До 10 000 строк данных</li>
+        <li>AI-вопросов: 50 в месяц</li>
+        <li>Базовые интеграции</li>
+        <li>1 пользователь</li>
+      </ul>
+      <a href="#" class="btn-plan">Начать бесплатно</a>
+    </div>
+    <div class="plan featured reveal">
+      <div class="plan-label">★ Бизнес</div>
+      <div class="plan-price">$49</div>
+      <div class="plan-period">/ пользователь в месяц</div>
+      <ul class="plan-features">
+        <li>Безлимитные дашборды</li>
+        <li>До 10 млн строк данных</li>
+        <li>Безлимитные AI-вопросы</li>
+        <li>Все интеграции + API</li>
+        <li>До 20 пользователей</li>
+      </ul>
+      <a href="#" class="btn-plan">Попробовать 14 дней</a>
+    </div>
+    <div class="plan reveal">
+      <div class="plan-label">Enterprise</div>
+      <div class="plan-price">Договор</div>
+      <div class="plan-period">/ индивидуально</div>
+      <ul class="plan-features">
+        <li>Всё из Бизнес</li>
+        <li>On-premise развёртывание</li>
+        <li>SLA 99.9% + поддержка 24/7</li>
+        <li>Кастомные интеграции</li>
+        <li>Безлимитные пользователи</li>
+      </ul>
+      <a href="#" class="btn-plan">Связаться с нами</a>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="cta-section">
+  <h2 class="cta-text reveal" id="cta-heading">Хватит<br>гадать.<br><em>Знай точно.</em></h2>
+  <div class="waitlist-form reveal">
+    <input type="email" class="waitlist-input" id="waitlist-email" placeholder="your@email.com" />
+    <button class="waitlist-submit" id="waitlist-btn" onclick="submitWaitlist()">
+      <span id="waitlist-btn-text">Получить доступ →</span>
+    </button>
+  </div>
+  <div class="waitlist-count" id="waitlist-count"><b id="wl-num">247</b> человек уже в очереди</div>
+  <div class="waitlist-success" id="waitlist-success">✓ Вы в списке! Мы напишем когда откроем доступ.</div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-copy">© 2026 NEXORA Technologies. Odessa, Ukraine.</div>
+  <div class="footer-links">
+    <a href="#">Privacy</a>
+    <a href="#">Terms</a>
+    <a href="#">Telegram</a>
+    <a href="#">careers</a>
+  </div>
+</footer>
+<script>
+// === GLOBAL: lang/currency functions (must be global for onclick) ===
+// === LANGUAGE SWITCHER ===
+const translations = {
+  ru: {
+    'hero-tag': 'Открыт ранний доступ · 2026',
+    'hero-h1': 'Данные<br>которые<br><em>работают</em>',
+    'hero-desc': 'NEXORA — AI-платформа для бизнеса, которая превращает хаос из Excel и CRM в живые инсайты за 30 секунд. Без дата-сайентистов. Без боли.',
+    'btn-hero': 'Начать бесплатно →',
+    'scroll-hint': '↓ прокрути вниз',
+    'stat-labels': ['B2B клиентов','до первого инсайта','привлечено инвестиций','uptime гарантия'],
+    'section-labels': ['Проблема','Решение','Продукт','Тарифы'],
+    'about-title': 'Аналитика<br>убивает<br>время',
+    'about-body-1': 'Средний менеджер тратит 11 часов в неделю на сводные таблицы и отчёты. Это 25% рабочего времени — впустую.',
+    'about-body-2': 'Данные есть у всех. Понимать их — нет. NEXORA закрывает этот разрыв.',
+    'big-quote': 'Загрузи таблицу — получи <em>стратегию.</em> Спроси вопрос — получи ответ с графиком.',
+    'features-title': 'Что<br>внутри',
+    'feature-names': ['AI-аналитик','Авто-дашборды','Прогнозирование','100+ интеграций','Безопасность','Командная работа'],
+    'feature-descs': [
+      'Задавай вопросы к данным на русском языке. Получай ответы с визуализацией за секунды, как у ChatGPT, но про твой бизнес.',
+      'Загрузи CSV или подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.',
+      'ML-модели строят прогнозы продаж, оттока клиентов и спроса. Настраивается под твой рынок за один клик.',
+      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — подключаем всё где живут твои данные. API за 15 минут.',
+      'Данные не покидают твой контур. Европейский дата-центр, GDPR, SOC2 в процессе. Enterprise-уровень для любого тарифа.',
+      'Шэри дашборды с командой, ставь задачи на инсайты, экспортируй PDF-отчёты с брендингом в один клик.'
+    ],
+    'pricing-title': 'Цены<br>без сюрпризов',
+    'plan-labels': ['Старт','★ Бизнес','Enterprise'],
+    'plan-periods': ['/ навсегда бесплатно','/ пользователь в месяц','/ индивидуально'],
+    'enterprise-price': 'Договор',
+    'plan-features': [
+      ['3 дашборда','До 10 000 строк данных','AI-вопросов: 50 в месяц','Базовые интеграции','1 пользователь'],
+      ['Безлимитные дашборды','До 10 млн строк данных','Безлимитные AI-вопросы','Все интеграции + API','До 20 пользователей'],
+      ['Всё из Бизнес','On-premise развёртывание','SLA 99.9% + поддержка 24/7','Кастомные интеграции','Безлимитные пользователи']
+    ],
+    'btn-plans': ['Начать бесплатно','Попробовать 14 дней','Связаться с нами'],
+    'cta-text': 'Хватит<br>гадать.<br><em>Знай точно.</em>',
+    'btn-cta': 'Получить ранний доступ →',
+    'waitlist-placeholder': 'ваш@email.com',
+    'waitlist-btn': 'Получить доступ →',
+    'waitlist-count': ' человек уже в очереди',
+    'waitlist-success': '✓ Вы в списке! Мы напишем когда откроем доступ.',
+    'footer': '© 2026 NEXORA Technologies. Odessa, Ukraine.',
+    'nav': ['О нас','Продукт','Тарифы'],
+  },
+  en: {
+    'hero-tag': 'Early access open · 2026',
+    'hero-h1': 'Data that<br>actually<br><em>works</em>',
+    'hero-desc': 'NEXORA — an AI platform that turns chaos from Excel and CRM into live insights in 30 seconds. No data scientists. No pain.',
+    'btn-hero': 'Start for free →',
+    'scroll-hint': '↓ scroll down',
+    'stat-labels': ['B2B clients','to first insight','raised in funding','uptime guarantee'],
+    'section-labels': ['Problem','Solution','Product','Pricing'],
+    'about-title': 'Analytics<br>kills<br>time',
+    'about-body-1': "The average manager spends 11 hours a week on spreadsheets and reports. That's 25% of working time — wasted.",
+    'about-body-2': 'Everyone has data. Understanding it — not everyone. NEXORA closes that gap.',
+    'big-quote': 'Upload a spreadsheet — get a <em>strategy.</em> Ask a question — get an answer with a chart.',
+    'features-title': "What's<br>inside",
+    'feature-names': ['AI Analyst','Auto-dashboards','Forecasting','100+ Integrations','Security','Team collaboration'],
+    'feature-descs': [
+      'Ask questions about your data in plain language. Get answers with visualizations in seconds — like ChatGPT, but for your business.',
+      'Upload a CSV or connect your CRM — the system automatically builds key metrics, trends and anomalies. Zero setup.',
+      'ML models forecast sales, customer churn and demand. Configurable for your market in one click.',
+      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — connect anywhere your data lives. API in 15 minutes.',
+      'Your data never leaves your perimeter. SOC2 in progress. Enterprise-grade security on every plan.',
+      'Share dashboards with your team, assign tasks on insights, export branded PDF reports in one click.'
+    ],
+    'pricing-title': 'Pricing<br>no surprises',
+    'plan-labels': ['Starter','★ Business','Enterprise'],
+    'plan-periods': ['/ free forever','/ user per month','/ custom'],
+    'enterprise-price': 'Custom',
+    'plan-features': [
+      ['3 dashboards','Up to 10,000 rows','50 AI questions/month','Basic integrations','1 user'],
+      ['Unlimited dashboards','Up to 10M rows','Unlimited AI questions','All integrations + API','Up to 20 users'],
+      ['Everything in Business','On-premise deployment','SLA 99.9% + 24/7 support','Custom integrations','Unlimited users']
+    ],
+    'btn-plans': ['Start for free','Try 14 days free','Contact us'],
+    'cta-text': 'Stop<br>guessing.<br><em>Know for sure.</em>',
+    'btn-cta': 'Get early access →',
+    'waitlist-placeholder': 'your@email.com',
+    'waitlist-btn': 'Get access →',
+    'waitlist-count': ' people already on the list',
+    'waitlist-success': '✓ You are on the list! We will reach out when access opens.',
+    'footer': '© 2026 NEXORA Technologies. Odessa, Ukraine.',
+    'nav': ['About','Product','Pricing'],
+  }  ,
+  uk: {
+    'hero-tag': 'Ранній доступ відкрито · 2026',
+    'hero-h1': 'Дані які<br>справді<br><em>працюють</em>',
+    'hero-desc': 'NEXORA — AI-платформа для бізнесу, яка перетворює хаос з Excel та CRM на живі інсайти за 30 секунд. Без дата-сайентистів. Без болю.',
+    'btn-hero': 'Почати безкоштовно →',
+    'scroll-hint': '↓ прокрути вниз',
+    'stat-labels': ['B2B клієнтів','до першого інсайту','залучено інвестицій','uptime гарантія'],
+    'section-labels': ['Проблема','Рішення','Продукт','Тарифи'],
+    'about-title': 'Аналітика<br>вбиває<br>час',
+    'about-body-1': 'Середній менеджер витрачає 11 годин на тиждень на зведені таблиці та звіти. Це 25% робочого часу — даремно.',
+    'about-body-2': 'Дані є у всіх. Розуміти їх — ні. NEXORA закриває цей розрив.',
+    'big-quote': 'Завантаж таблицю — отримай <em>стратегію.</em> Постав питання — отримай відповідь з графіком.',
+    'features-title': 'Що<br>всередині',
+    'feature-names': ['AI-аналітик','Авто-дашборди','Прогнозування','100+ інтеграцій','Безпека','Командна робота'],
+    'feature-descs': [
+      'Став питання до даних українською мовою. Отримуй відповіді з візуалізацією за секунди — як ChatGPT, але про твій бізнес.',
+      'Завантаж CSV або підключи CRM — система сама побудує ключові метрики, тренди та аномалії. Без налаштувань.',
+      'ML-моделі будують прогнози продажів, відтоку клієнтів та попиту. Налаштовується під твій ринок за один клік.',
+      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — підключаємо всюди де живуть твої дані. API за 15 хвилин.',
+      'Дані не покидають твій контур. SOC2 в процесі. Enterprise-рівень безпеки для будь-якого тарифу.',
+      'Ділись дашбордами з командою, ставь завдання на інсайти, експортуй PDF-звіти з брендингом в один клік.'
+    ],
+    'pricing-title': 'Ціни<br>без сюрпризів',
+    'plan-labels': ['Старт','★ Бізнес','Enterprise'],
+    'plan-periods': ['/ назавжди безкоштовно','/ користувач на місяць','/ індивідуально'],
+    'enterprise-price': 'Договір',
+    'plan-features': [
+      ['3 дашборди','До 10 000 рядків даних','AI-питань: 50 на місяць','Базові інтеграції','1 користувач'],
+      ['Безлімітні дашборди','До 10 млн рядків даних','Безлімітні AI-питання','Всі інтеграції + API','До 20 користувачів'],
+      ['Все з Бізнес','On-premise розгортання','SLA 99.9% + підтримка 24/7','Кастомні інтеграції','Безлімітні користувачі']
+    ],
+    'btn-plans': ['Почати безкоштовно','Спробувати 14 днів','Зв\'язатися з нами'],
+    'cta-text': 'Годі<br>гадати.<br><em>Знай точно.</em>',
+    'btn-cta': 'Отримати ранній доступ →',
+    'footer': '© 2026 NEXORA Technologies. Odessa, Ukraine.',
+    'nav': ['Про нас','Продукт','Тарифи'],
+    'waitlist-placeholder': 'ваш@email.com',
+    'waitlist-btn': 'Отримати доступ →',
+    'waitlist-count': ' людей вже в черзі',
+    'waitlist-success': '✓ Ви в списку! Ми напишемо коли відкриємо доступ.',
+  }
+,
+  uk: {
+    'hero-tag': 'Ранній доступ відкрито · 2026',
+    'hero-h1': 'Дані які<br>справді<br><em>працюють</em>',
+    'hero-desc': 'NEXORA — AI-платформа для бізнесу, яка перетворює хаос з Excel та CRM на живі інсайти за 30 секунд. Без дата-сайентистів. Без болю.',
+    'btn-hero': 'Почати безкоштовно →',
+    'scroll-hint': '↓ прокрути вниз',
+    'stat-labels': ['B2B клієнтів','до першого інсайту','залучено інвестицій','uptime гарантія'],
+    'section-labels': ['Проблема','Рішення','Продукт','Тарифи'],
+    'about-title': 'Аналітика<br>вбиває<br>час',
+    'about-body-1': 'Середній менеджер витрачає 11 годин на тиждень на зведені таблиці та звіти. Це 25% робочого часу — даремно.',
+    'about-body-2': 'Дані є у всіх. Розуміти їх — ні. NEXORA закриває цей розрив.',
+    'big-quote': 'Завантаж таблицю — отримай <em>стратегію.</em> Постав питання — отримай відповідь з графіком.',
+    'features-title': 'Що<br>всередині',
+    'feature-names': ['AI-аналітик','Авто-дашборди','Прогнозування','100+ інтеграцій','Безпека','Командна робота'],
+    'feature-descs': [
+      'Став питання до даних українською мовою. Отримуй відповіді з візуалізацією за секунди.',
+      'Завантаж CSV або підключи CRM — система сама побудує ключові метрики, тренди та аномалії. Без налаштувань.',
+      'ML-моделі будують прогнози продажів, відтоку клієнтів та попиту. Налаштовується за один клік.',
+      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — підключаємо всюди де живуть твої дані.',
+      'Дані не покидають твій контур. SOC2 в процесі. Enterprise-рівень безпеки для будь-якого тарифу.',
+      'Ділись дашбордами з командою, ставь завдання на інсайти, експортуй PDF-звіти в один клік.'
+    ],
+    'pricing-title': 'Ціни<br>без сюрпризів',
+    'plan-labels': ['Старт','★ Бізнес','Enterprise'],
+    'plan-periods': ['/ назавжди безкоштовно','/ користувач на місяць','/ індивідуально'],
+    'enterprise-price': 'Договір',
+    'plan-features': [
+      ['3 дашборди','До 10 000 рядків даних','AI-питань: 50 на місяць','Базові інтеграції','1 користувач'],
+      ['Безлімітні дашборди','До 10 млн рядків даних','Безлімітні AI-питання','Всі інтеграції + API','До 20 користувачів'],
+      ['Все з Бізнес','On-premise розгортання','SLA 99.9% + підтримка 24/7','Кастомні інтеграції','Безлімітні користувачі']
+    ],
+    'btn-plans': ['Почати безкоштовно','Спробувати 14 днів','Зв\'язатися з нами'],
+    'cta-text': 'Годі<br>гадати.<br><em>Знай точно.</em>',
+    'btn-cta': 'Отримати ранній доступ →',
+    'footer': '© 2026 NEXORA Technologies. Odessa, Ukraine.',
+    'nav': ['Про нас','Продукт','Тарифи'],
+    'waitlist-placeholder': 'ваш@email.com',
+    'waitlist-btn': 'Отримати доступ →',
+    'waitlist-count': ' людей вже в черзі',
+    'waitlist-success': '✓ Ви в списку! Ми напишемо коли відкриємо доступ.',
+  }
+};
+
+let currentLang = 'ru';
+let currentCurrency = 'usd';
+
+function setLang(lang) {
+  currentLang = lang;
+  const t = translations[lang];
+  const heroTag = document.querySelector('.hero-tag');
+  if (heroTag) heroTag.innerHTML = '<span class="dot"></span>' + t['hero-tag'];
+  const h1 = document.querySelector('h1');
+  if (h1) h1.innerHTML = t['hero-h1'];
+  const heroDesc = document.querySelector('.hero-desc');
+  if (heroDesc) heroDesc.textContent = t['hero-desc'];
+  const btnHero = document.querySelector('.btn-primary span');
+  if (btnHero) btnHero.textContent = t['btn-hero'];
+  const scrollHint = document.querySelector('.scroll-hint');
+  if (scrollHint) scrollHint.textContent = t['scroll-hint'];
+  document.querySelectorAll('.stat-label').forEach((el,i) => { el.textContent = t['stat-labels'][i]; });
+  document.querySelectorAll('.section-label').forEach((el,i) => { if(t['section-labels'][i]) el.textContent = t['section-labels'][i]; });
+  const aboutTitle = document.querySelector('.about-title');
+  if (aboutTitle) aboutTitle.innerHTML = t['about-title'];
+  const aboutBodies = document.querySelectorAll('.about-body');
+  if (aboutBodies[0]) aboutBodies[0].textContent = t['about-body-1'];
+  if (aboutBodies[1]) aboutBodies[1].textContent = t['about-body-2'];
+  const bigQuote = document.querySelector('.big-quote');
+  if (bigQuote) bigQuote.innerHTML = t['big-quote'];
+  const featTitle = document.querySelector('.features-title');
+  if (featTitle) featTitle.innerHTML = t['features-title'];
+  document.querySelectorAll('.feature-name').forEach((el,i) => { el.textContent = t['feature-names'][i]; });
+  document.querySelectorAll('.feature-desc').forEach((el,i) => { el.textContent = t['feature-descs'][i]; });
+  const pricTitle = document.querySelector('.pricing-title');
+  if (pricTitle) pricTitle.innerHTML = t['pricing-title'];
+  document.querySelectorAll('.plan-label').forEach((el,i) => { el.textContent = t['plan-labels'][i]; });
+  document.querySelectorAll('.plan-period').forEach((el,i) => { el.textContent = t['plan-periods'][i]; });
+  const planPrices = document.querySelectorAll('.plan-price');
+  if (planPrices[2]) planPrices[2].textContent = t['enterprise-price'];
+  document.querySelectorAll('.plan-features').forEach((ul,pi) => {
+    ul.querySelectorAll('li').forEach((li,fi) => { li.textContent = t['plan-features'][pi][fi]; });
+  });
+  document.querySelectorAll('.btn-plan').forEach((el,i) => { el.textContent = t['btn-plans'][i]; });
+  const ctaText = document.querySelector('.cta-text');
+  if (ctaText) ctaText.innerHTML = t['cta-text'];
+  const btnCta = document.querySelector('.cta-section .btn-primary span');
+  if (btnCta) btnCta.textContent = t['btn-cta'];
+  const footerCopy = document.querySelector('.footer-copy');
+  if (footerCopy) footerCopy.textContent = t['footer'];
+  document.querySelectorAll('#nav-links a').forEach((a,i) => { a.textContent = t['nav'][i]; });
+  const wlInput = document.getElementById('waitlist-email');
+  if (wlInput && t['waitlist-placeholder']) wlInput.placeholder = t['waitlist-placeholder'];
+  const wlBtn = document.getElementById('waitlist-btn-text');
+  if (wlBtn && t['waitlist-btn']) wlBtn.textContent = t['waitlist-btn'];
+  const wlCount = document.getElementById('waitlist-count');
+  if (wlCount && t['waitlist-count']) { const n = document.getElementById('wl-num'); wlCount.innerHTML = '<b id="wl-num">' + (n ? n.textContent : '247') + '</b>' + t['waitlist-count']; }
+  const wlSuccess = document.getElementById('waitlist-success');
+  if (wlSuccess && t['waitlist-success']) wlSuccess.textContent = t['waitlist-success'];
+  setCurrency(currentCurrency);
+}
+
+const currencyData = {
+  usd: { starter: '$0', business: '$49' },
+  eur: { starter: '€0', business: '€45' },
+  uah: { starter: '₴0', business: '₴1 990' },
+};
+
+function setCurrency(currency) {
+  currentCurrency = currency;
+  const p = currencyData[currency];
+  const planPrices = document.querySelectorAll('.plan-price');
+  if (planPrices[0]) planPrices[0].textContent = p.starter;
+  if (planPrices[1]) planPrices[1].textContent = p.business;
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+// Custom cursor
+const cursor = document.getElementById('cursor');
+document.addEventListener('mousemove', e => {
+  cursor.style.left = e.clientX + 'px';
+  cursor.style.top = e.clientY + 'px';
+});
+document.querySelectorAll('a, button, .btn-primary, .btn-plan, .feature-card, .plan, .stat-item').forEach(el => {
+  el.addEventListener('mouseenter', () => cursor.classList.add('hover'));
+  el.addEventListener('mouseleave', () => cursor.classList.remove('hover'));
+});
+
+// Reveal on scroll
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach((entry, i) => {
+    if (entry.isIntersecting) {
+      setTimeout(() => entry.target.classList.add('visible'), i * 80);
+    }
+  });
+}, { threshold: 0.15 });
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Counter animation
+function animateCount(el, target, suffix) {
+  let start = 0;
+  const duration = 1500;
+  const step = timestamp => {
+    if (!start) start = timestamp;
+    const progress = Math.min((timestamp - start) / duration, 1);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.textContent = (Number.isInteger(target) ? Math.round(target * ease) : (target * ease).toFixed(1)) + suffix;
+    if (progress < 1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
+const statsObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      const nums = [
+        { el: document.querySelectorAll('.stat-num')[0], val: 180, suffix: '+' },
+        { el: document.querySelectorAll('.stat-num')[1], val: 30, suffix: 'с' },
+        { el: document.querySelectorAll('.stat-num')[2], val: 2.4, suffix: 'M$' },
+        { el: document.querySelectorAll('.stat-num')[3], val: 99, suffix: '%' },
+      ];
+      nums.forEach(n => animateCount(n.el, n.val, n.suffix));
+      statsObserver.disconnect();
+    }
+  });
+}, { threshold: 0.5 });
+const statsSection = document.querySelector('.stats');
+if (statsSection) statsObserver.observe(statsSection);
+
+// Waitlist form
+window.submitWaitlist = function() {
+  const email = document.getElementById('waitlist-email').value.trim();
+  if (!email || !email.includes('@')) {
+    document.getElementById('waitlist-email').style.borderColor = '#E84B1A';
+    return;
+  }
+  document.getElementById('waitlist-email').style.borderColor = '';
+  const btn = document.getElementById('waitlist-btn');
+  btn.disabled = true;
+  document.getElementById('waitlist-btn-text').textContent = '...';
+  
+  // Simulate save (replace with real API call later)
+  setTimeout(() => {
+    const form = document.querySelector('.waitlist-form');
+    const count = document.getElementById('waitlist-count');
+    const success = document.getElementById('waitlist-success');
+    const num = document.getElementById('wl-num');
+    form.style.display = 'none';
+    count.style.display = 'none';
+    success.style.display = 'block';
+    // Save to localStorage for persistence
+    const emails = JSON.parse(localStorage.getItem('nexora_waitlist') || '[]');
+    emails.push({ email, date: new Date().toISOString() });
+    localStorage.setItem('nexora_waitlist', JSON.stringify(emails));
+  }, 800);
+};
+
+// Update waitlist count from localStorage
+const stored = JSON.parse(localStorage.getItem('nexora_waitlist') || '[]');
+const numEl = document.getElementById('wl-num');
+if (numEl && stored.length > 0) numEl.textContent = 247 + stored.length;
+
+// Allow Enter key on input
+const wlInput = document.getElementById('waitlist-email');
+if (wlInput) wlInput.addEventListener('keydown', e => { if(e.key==='Enter') submitWaitlist(); });
+
+// Translate waitlist elements
+const origSetLang = window.setLang;
+
+// ── AUTO DETECT LANGUAGE & CURRENCY BY REGION ────────────────────────────
+async function autoDetectRegion() {
+  const euCountries = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE',
+    'GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI',
+    'ES','SE','NO','CH','GB','IS','LI','AL','BA','ME','MK','RS','TR'];
+
+  try {
+    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
+    const geo = await res.json();
+    const country = geo.country_code;
+
+    if (country === 'UA') {
+      setLang('uk'); setCurrency('uah');
+    } else if (['US','CA','AU'].includes(country)) {
+      setLang('en'); setCurrency('usd');
+    } else if (euCountries.includes(country)) {
+      setLang('en'); setCurrency('eur');
+    } else {
+      setLang('en'); setCurrency('usd');
+    }
+  } catch {
+    const lang = (navigator.language || 'en').toLowerCase();
+    if (lang.startsWith('uk')) { setLang('uk'); setCurrency('uah'); }
+    else if (lang.startsWith('ru')) { setLang('ru'); setCurrency('usd'); }
+    else { setLang('en'); setCurrency('usd'); }
+  }
+}
+
+autoDetectRegion();
+
+
+// ── AUTH ─────────────────────────────────────────────────────────────────────
+const API = 'http://localhost:8000'; // Замени на свой домен при деплое
+let authToken = localStorage.getItem('nexora_token') || null;
+let authUser  = JSON.parse(localStorage.getItem('nexora_user') || 'null');
+
+function openAuth(tab = 'login') {
+  document.getElementById('auth-overlay').classList.add('open');
+  switchTab(tab);
+  document.body.style.overflow = 'hidden';
+}
+function closeAuth() {
+  document.getElementById('auth-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+}
+function closeAuthOnOverlay(e) {
+  if (e.target === document.getElementById('auth-overlay')) closeAuth();
+}
+function switchTab(tab) {
+  document.getElementById('form-login').style.display    = tab === 'login'    ? 'block' : 'none';
+  document.getElementById('form-register').style.display = tab === 'register' ? 'block' : 'none';
+  document.getElementById('tab-login').classList.toggle('active',    tab === 'login');
+  document.getElementById('tab-register').classList.toggle('active', tab === 'register');
+}
+
+function setAuthLoading(btn, textEl, loading, text) {
+  btn.disabled = loading;
+  textEl.textContent = loading ? '...' : text;
+}
+
+function showMsg(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'auth-msg ' + type;
+}
+
+async function doLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email || !password) return showMsg('login-msg', 'Заполните все поля', 'error');
+
+  const btn = document.getElementById('login-btn');
+  const txt = document.getElementById('login-btn-text');
+  setAuthLoading(btn, txt, true);
+
+  try {
+    const res = await fetch(API + '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: `username=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ошибка входа');
+    onAuthSuccess(data);
+  } catch (e) {
+    showMsg('login-msg', e.message, 'error');
+  }
+  setAuthLoading(btn, txt, false, 'Войти →');
+}
+
+async function doRegister() {
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  if (!name || !email || !password) return showMsg('reg-msg', 'Заполните все поля', 'error');
+  if (password.length < 8) return showMsg('reg-msg', 'Пароль минимум 8 символов', 'error');
+
+  const btn = document.getElementById('reg-btn');
+  const txt = document.getElementById('reg-btn-text');
+  setAuthLoading(btn, txt, true);
+
+  try {
+    const res = await fetch(API + '/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.detail || 'Ошибка регистрации');
+    onAuthSuccess(data);
+  } catch (e) {
+    showMsg('reg-msg', e.message, 'error');
+  }
+  setAuthLoading(btn, txt, false, 'Создать аккаунт →');
+}
+
+function onAuthSuccess(data) {
+  authToken = data.access_token;
+  authUser  = { email: data.email, id: data.user_id, plan: data.plan };
+  localStorage.setItem('nexora_token', authToken);
+  localStorage.setItem('nexora_user',  JSON.stringify(authUser));
+  updateNavAuth();
+  closeAuth();
+}
+
+function doLogout() {
+  authToken = null; authUser = null;
+  localStorage.removeItem('nexora_token');
+  localStorage.removeItem('nexora_user');
+  updateNavAuth();
+}
+
+function updateNavAuth() {
+  const area = document.getElementById('nav-auth-area');
+  if (!area) return;
+  if (authUser) {
+    const plan = authUser.plan === 'business' ? '★' : authUser.plan === 'enterprise' ? '◆' : '';
+    area.innerHTML = `
+      <div class="nav-user">
+        <span class="nav-user-email">${plan ? plan + ' ' : ''}${authUser.email}</span>
+        <button class="btn-logout" onclick="doLogout()">Выйти</button>
+      </div>`;
+  } else {
+    area.innerHTML = '<button class="btn-nav-auth" onclick="openAuth(\'login\')">Войти</button>';
+  }
+}
+
+// Keyboard shortcut: Escape closes modal
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeAuth(); });
+
+// Restore session on page load
+updateNavAuth();
+
+}); // DOMContentLoaded
+</script>
+
+<!-- AUTH MODAL -->
+<div class="auth-overlay" id="auth-overlay" onclick="closeAuthOnOverlay(event)">
+  <div class="auth-modal">
+    <button class="auth-close" onclick="closeAuth()">✕</button>
+    <div class="auth-logo">NEXORA</div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tab-login" onclick="switchTab('login')">Войти</button>
+      <button class="auth-tab" id="tab-register" onclick="switchTab('register')">Регистрация</button>
+    </div>
+
+    <!-- LOGIN FORM -->
+    <div id="form-login">
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="login-email" placeholder="your@email.com" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Пароль</label>
+        <input type="password" class="auth-input" id="login-password" placeholder="••••••••" />
+      </div>
+      <button class="auth-submit" id="login-btn" onclick="doLogin()">
+        <span id="login-btn-text">Войти →</span>
+      </button>
+      <div class="auth-msg" id="login-msg"></div>
+      <div class="auth-divider">или</div>
+      <div style="text-align:center; font-size:13px; color:rgba(245,240,232,0.4);">
+        Нет аккаунта? <a href="#" onclick="switchTab('register')" style="color:var(--acid);">Зарегистрироваться</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="form-register" style="display:none;">
+      <div class="auth-field">
+        <label class="auth-label">Имя</label>
+        <input type="text" class="auth-input" id="reg-name" placeholder="Ваше имя" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Email</label>
+        <input type="email" class="auth-input" id="reg-email" placeholder="your@email.com" />
+      </div>
+      <div class="auth-field">
+        <label class="auth-label">Пароль</label>
+        <input type="password" class="auth-input" id="reg-password" placeholder="Минимум 8 символов" />
+      </div>
+      <button class="auth-submit" id="reg-btn" onclick="doRegister()">
+        <span id="reg-btn-text">Создать аккаунт →</span>
+      </button>
+      <div class="auth-msg" id="reg-msg"></div>
+      <div class="auth-divider">или</div>
+      <div style="text-align:center; font-size:13px; color:rgba(245,240,232,0.4);">
+        Уже есть аккаунт? <a href="#" onclick="switchTab('login')" style="color:var(--acid);">Войти</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
