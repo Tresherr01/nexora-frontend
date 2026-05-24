@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NEXORA — AI Analytics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+<style>
+  :root {
+    --black: #080808; --white: #F5F0E8; --acid: #C8FF00;
+    --rust: #E84B1A; --dim: #111; --mid: #222; --border: #2a2a2a;
+    --dim-text: rgba(245,240,232,0.4);
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; }
+  body { background: var(--black); color: var(--white); font-family: 'DM Sans', sans-serif; font-weight: 300; display: flex; flex-direction: column; }
+
+  /* TOPBAR */
+  .topbar { display: flex; align-items: center; justify-content: space-between; padding: 0 20px; height: 52px; border-bottom: 1px solid var(--border); flex-shrink: 0; background: var(--dim); gap: 12px; }
+  .topbar-logo { font-family: 'Bebas Neue', sans-serif; font-size: 20px; letter-spacing: 3px; color: var(--white); text-decoration: none; flex-shrink: 0; }
+  .topbar-logo span { color: var(--acid); }
+  .topbar-right { display: flex; align-items: center; gap: 10px; flex: 1; justify-content: flex-end; }
+  .status-dot { display: flex; align-items: center; gap: 6px; font-size: 11px; color: var(--dim-text); white-space: nowrap; }
+  .dot-live { width: 7px; height: 7px; border-radius: 50%; background: var(--acid); animation: blink 2s infinite; }
+  @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.3} }
+  .api-key-wrap { display: flex; }
+  .api-key-input { background: var(--mid); border: 1px solid var(--border); border-right: none; padding: 6px 10px; color: var(--white); font-family: 'DM Mono', monospace; font-size: 11px; outline: none; width: 180px; }
+  .api-key-input:focus { border-color: var(--acid); }
+  .api-key-input::placeholder { color: rgba(245,240,232,0.2); font-size: 10px; }
+  .btn-save-key { background: transparent; border: 1px solid var(--border); color: var(--dim-text); padding: 6px 10px; font-size: 10px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; }
+  .btn-save-key:hover { border-color: var(--acid); color: var(--acid); }
+  .key-saved { font-size: 11px; color: var(--acid); letter-spacing: 1px; white-space: nowrap; cursor: pointer; }
+  .btn-upload { display: flex; align-items: center; gap: 6px; padding: 7px 14px; background: transparent; border: 1px solid var(--border); color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 11px; letter-spacing: 1px; text-transform: uppercase; cursor: pointer; transition: border-color 0.2s, color 0.2s; white-space: nowrap; }
+  .btn-upload:hover { border-color: var(--acid); color: var(--acid); }
+
+  /* MAIN */
+  .main { display: grid; grid-template-columns: 240px 1fr 340px; flex: 1; overflow: hidden; }
+
+  /* SIDEBAR */
+  .sidebar { border-right: 1px solid var(--border); display: flex; flex-direction: column; overflow: hidden; background: var(--dim); }
+  .sidebar-section { padding: 14px 16px; border-bottom: 1px solid var(--border); }
+  .sidebar-label { font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--dim-text); margin-bottom: 8px; }
+  .file-name { font-size: 12px; color: var(--acid); word-break: break-all; }
+  .stats-mini { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; padding: 10px 16px; border-bottom: 1px solid var(--border); }
+  .stat-mini { border: 1px solid var(--border); padding: 8px 10px; }
+  .stat-mini-val { font-family: 'Bebas Neue', sans-serif; font-size: 20px; color: var(--acid); line-height: 1; }
+  .stat-mini-label { font-size: 10px; color: var(--dim-text); letter-spacing: 1px; }
+  .drop-zone { border: 1px dashed var(--border); padding: 28px 16px; text-align: center; cursor: pointer; transition: border-color 0.3s; margin: 14px; }
+  .drop-zone:hover, .drop-zone.drag-over { border-color: var(--acid); }
+  .drop-icon { font-size: 24px; margin-bottom: 8px; }
+  .drop-text { font-size: 11px; color: var(--dim-text); line-height: 1.6; }
+  .drop-text b { color: var(--white); }
+  .cols-list { flex: 1; overflow-y: auto; padding: 10px 16px; }
+  .col-tag { display: flex; align-items: center; justify-content: space-between; padding: 7px 10px; margin-bottom: 3px; border: 1px solid var(--border); font-size: 11px; cursor: pointer; transition: border-color 0.2s; }
+  .col-tag:hover { border-color: var(--acid); }
+  .col-type { font-size: 9px; letter-spacing: 1px; color: var(--dim-text); font-family: 'DM Mono', monospace; }
+  .col-type.num { color: var(--acid); }
+
+  /* DASHBOARD */
+  .dashboard { display: flex; flex-direction: column; overflow: hidden; }
+  .dash-header { padding: 16px 20px 0; flex-shrink: 0; }
+  .dash-title { font-family: 'Bebas Neue', sans-serif; font-size: 22px; letter-spacing: 2px; color: var(--dim-text); }
+  .dash-title span { color: var(--white); }
+  .charts-area { flex: 1; overflow-y: auto; padding: 16px 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; align-content: start; }
+  .chart-card { border: 1px solid var(--border); padding: 16px; background: var(--dim); }
+  .chart-card.wide { grid-column: 1 / -1; }
+  .chart-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim-text); margin-bottom: 12px; }
+  canvas { max-height: 180px; }
+  .empty-state { grid-column: 1/-1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 60px 20px; text-align: center; border: 1px dashed var(--border); }
+  .empty-big { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--border); line-height: 1; margin-bottom: 8px; }
+  .empty-sub { font-size: 13px; color: var(--dim-text); }
+
+  /* RESULT CARD */
+  .result-card { border: 1px solid rgba(200,255,0,0.2); background: rgba(200,255,0,0.03); padding: 16px; grid-column: 1/-1; }
+  .result-card-title { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--acid); margin-bottom: 10px; }
+  .result-value { font-family: 'DM Mono', monospace; font-size: 13px; color: var(--white); line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+
+  /* CHAT */
+  .chat-panel { border-left: 1px solid var(--border); display: flex; flex-direction: column; background: var(--dim); overflow: hidden; }
+  .chat-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .chat-header-icon { font-size: 16px; }
+  .chat-header-title { font-size: 13px; font-weight: 500; }
+  .chat-header-sub { font-size: 10px; color: var(--dim-text); }
+  .chat-messages { flex: 1; overflow-y: auto; padding: 12px; display: flex; flex-direction: column; gap: 10px; }
+  .msg { max-width: 92%; animation: msgIn 0.25s ease; }
+  @keyframes msgIn { from { opacity:0; transform: translateY(6px); } to { opacity:1; transform: none; } }
+  .msg.user { align-self: flex-end; }
+  .msg.ai { align-self: flex-start; }
+  .msg-bubble { padding: 9px 12px; font-size: 12px; line-height: 1.6; }
+  .msg.user .msg-bubble { background: var(--mid); border: 1px solid var(--border); }
+  .msg.ai .msg-bubble { background: rgba(200,255,0,0.05); border: 1px solid rgba(200,255,0,0.12); }
+  .msg-time { font-size: 10px; color: var(--dim-text); margin-top: 3px; text-align: right; }
+  .msg.ai .msg-time { text-align: left; }
+  .typing-indicator { display: flex; align-items: center; gap: 4px; padding: 9px 12px; background: rgba(200,255,0,0.05); border: 1px solid rgba(200,255,0,0.12); width: fit-content; }
+  .typing-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--acid); opacity: 0.3; animation: td 1.2s infinite; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes td { 0%,100%{opacity:0.2} 50%{opacity:1} }
+  .suggestions { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; }
+  .suggestions-label { font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: var(--dim-text); margin-bottom: 2px; }
+  .chip { padding: 6px 10px; border: 1px solid var(--border); font-size: 11px; color: var(--dim-text); cursor: pointer; text-align: left; background: transparent; font-family: 'DM Sans', sans-serif; transition: border-color 0.2s, color 0.2s; line-height: 1.4; }
+  .chip:hover { border-color: var(--acid); color: var(--white); }
+  .chat-input-area { padding: 10px 12px; border-top: 1px solid var(--border); display: flex; gap: 6px; flex-shrink: 0; }
+  .chat-input { flex: 1; background: var(--mid); border: 1px solid var(--border); padding: 9px 12px; color: var(--white); font-family: 'DM Sans', sans-serif; font-size: 12px; outline: none; transition: border-color 0.2s; }
+  .chat-input:focus { border-color: var(--acid); }
+  .chat-input::placeholder { color: var(--dim-text); }
+  .chat-send { background: var(--acid); color: var(--black); border: none; padding: 0 14px; font-size: 14px; cursor: pointer; transition: opacity 0.2s; }
+  .chat-send:hover { opacity: 0.8; }
+  .chat-send:disabled { opacity: 0.3; cursor: not-allowed; }
+  #file-input { display: none; }
+  * { scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+</style>
+</head>
+<body>
+<input type="file" id="file-input" accept=".csv,.tsv">
+
+<div class="topbar">
+  <a href="/" class="topbar-logo">NEX<span>ORA</span></a>
+  <div class="topbar-right">
+    <div class="status-dot"><div class="dot-live"></div><span id="status-text">Загрузите данные</span></div>
+    <span id="user-info" style="font-size:11px;color:var(--dim-text);letter-spacing:1px;"></span>
+    <button class="btn-upload" onclick="document.getElementById('file-input').click()">↑ CSV</button>
+    <button class="btn-save-key" onclick="doLogout()" style="color:var(--dim-text);">Выйти</button>
+  </div>
+</div>
+
+<div class="main">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Файл</div>
+      <div class="file-name" id="file-name">не выбран</div>
+    </div>
+    <div class="stats-mini" id="stats-mini" style="display:none">
+      <div class="stat-mini"><div class="stat-mini-val" id="s-rows">0</div><div class="stat-mini-label">СТРОК</div></div>
+      <div class="stat-mini"><div class="stat-mini-val" id="s-cols">0</div><div class="stat-mini-label">КОЛОНОК</div></div>
+    </div>
+    <div id="drop-wrap">
+      <div class="drop-zone" id="drop-zone" onclick="document.getElementById('file-input').click()">
+        <div class="drop-icon">📂</div>
+        <div class="drop-text"><b>Перетащи CSV</b><br>или нажми чтобы выбрать</div>
+      </div>
+    </div>
+    <div class="sidebar-section" id="cols-header" style="display:none">
+      <div class="sidebar-label">Колонки</div>
+    </div>
+    <div class="cols-list" id="cols-list"></div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div class="dashboard">
+    <div class="dash-header">
+      <div class="dash-title" id="dash-title">NEXORA <span>ANALYTICS</span></div>
+    </div>
+    <div class="charts-area" id="charts-area">
+      <div class="empty-state">
+        <div class="empty-big">NO DATA</div>
+        <div class="empty-sub">Загрузи CSV и задай вопрос →</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="chat-panel">
+    <div class="chat-header">
+      <div class="chat-header-icon">🧠</div>
+      <div><div class="chat-header-title">AI-аналитик</div><div class="chat-header-sub">Пишет код · браузер считает</div></div>
+    </div>
+    <div class="chat-messages" id="chat-messages">
+      <div class="msg ai">
+        <div class="msg-bubble">Привет! Загрузи CSV — и задавай любые вопросы о данных.</div>
+        <div class="msg-time">сейчас</div>
+      </div>
+    </div>
+    <div class="suggestions" id="suggestions">
+      <div class="suggestions-label">Быстрые вопросы</div>
+      <button class="chip" onclick="askChip(this)">Покажи сумму и среднее по всем числовым колонкам</button>
+      <button class="chip" onclick="askChip(this)">Топ-5 значений по главной метрике</button>
+      <button class="chip" onclick="askChip(this)">Найди выбросы и аномалии</button>
+    </div>
+    <div class="chat-input-area">
+      <input type="text" class="chat-input" id="chat-input" placeholder="Задай вопрос о данных..." />
+      <button class="chat-send" id="send-btn" onclick="sendMessage()">→</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ────────────────────────────────────────────────────────────────────
+const API = 'https://nexora-backend-piom.onrender.com'; // замени если URL изменится
+
+// ── AUTH CHECK ────────────────────────────────────────────────────────────────
+const authToken = localStorage.getItem('nexora_token');
+const authUser  = JSON.parse(localStorage.getItem('nexora_user') || 'null');
+
+if (!authToken || !authUser) {
+  // Не залогинен — редиректим на главную
+  window.location.href = '/';
+}
+
+// Показать email пользователя
+const userInfoEl = document.getElementById('user-info');
+if (authUser) userInfoEl.textContent = authUser.email;
+
+function doLogout() {
+  localStorage.removeItem('nexora_token');
+  localStorage.removeItem('nexora_user');
+  window.location.href = '/';
+}
+
+// ── STATE ─────────────────────────────────────────────────────────────────────
+let csvData = [];
+let csvHeaders = [];
+let chartInstances = [];
+let isSending = false;
+
+// ── FILE LOAD ─────────────────────────────────────────────────────────────────
+document.getElementById('file-input').addEventListener('change', e => {
+  if (e.target.files[0]) loadFile(e.target.files[0]);
+});
+document.body.addEventListener('dragover', e => { e.preventDefault(); document.getElementById('drop-zone').classList.add('drag-over'); });
+document.body.addEventListener('dragleave', () => document.getElementById('drop-zone').classList.remove('drag-over'));
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  document.getElementById('drop-zone').classList.remove('drag-over');
+  const f = e.dataTransfer.files[0];
+  if (f && (f.name.endsWith('.csv') || f.name.endsWith('.tsv'))) loadFile(f);
+});
+
+function loadFile(file) {
+  Papa.parse(file, {
+    header: true, skipEmptyLines: true, dynamicTyping: true,
+    complete: result => {
+      csvData = result.data;
+      csvHeaders = result.meta.fields || [];
+      updateSidebar(file.name);
+      buildCharts();
+      addMsg('ai', `✓ Загружено: **${file.name}** — ${csvData.length} строк, ${csvHeaders.length} колонок.\n\nГотов анализировать. Задавай вопросы!`);
+      updateChips();
+    }
+  });
+}
+
+function updateSidebar(name) {
+  document.getElementById('file-name').textContent = name;
+  document.getElementById('status-text').textContent = 'Данные загружены';
+  document.getElementById('stats-mini').style.display = 'grid';
+  document.getElementById('s-rows').textContent = csvData.length;
+  document.getElementById('s-cols').textContent = csvHeaders.length;
+  document.getElementById('drop-wrap').style.display = 'none';
+  document.getElementById('cols-header').style.display = 'block';
+  document.getElementById('dash-title').innerHTML = `NEXORA <span>${name.replace(/\.[^.]+$/, '').toUpperCase()}</span>`;
+  const list = document.getElementById('cols-list');
+  list.innerHTML = '';
+  csvHeaders.forEach(h => {
+    const isNum = csvData.slice(0,10).some(r => typeof r[h] === 'number' || (!isNaN(parseFloat(r[h])) && r[h] !== null && r[h] !== ''));
+    const d = document.createElement('div');
+    d.className = 'col-tag';
+    d.innerHTML = `<span>${h}</span><span class="col-type ${isNum?'num':''}">${isNum?'NUM':'TXT'}</span>`;
+    list.appendChild(d);
+  });
+}
+
+// ── CHARTS ────────────────────────────────────────────────────────────────────
+function getNumCols() { return csvHeaders.filter(h => csvData.some(r => typeof r[h] === 'number')); }
+function getTxtCols() { return csvHeaders.filter(h => csvData.some(r => typeof r[h] === 'string')); }
+
+function buildCharts() {
+  chartInstances.forEach(c => c.destroy());
+  chartInstances = [];
+  const area = document.getElementById('charts-area');
+  area.innerHTML = '';
+  const numCols = getNumCols();
+  const txtCols = getTxtCols();
+  if (!numCols.length) {
+    area.innerHTML = '<div class="empty-state"><div class="empty-big">NO NUMBERS</div><div class="empty-sub">Нет числовых колонок</div></div>';
+    return;
+  }
+  if (numCols[0]) {
+    const card = mkCard(`ТРЕНД: ${numCols[0].toUpperCase()}`, 'wide');
+    const ctx = card.querySelector('canvas').getContext('2d');
+    const labels = csvData.slice(0,40).map((r,i) => txtCols[0] ? String(r[txtCols[0]]).slice(0,12) : `#${i+1}`);
+    const values = csvData.slice(0,40).map(r => r[numCols[0]]);
+    chartInstances.push(new Chart(ctx, { type:'line', data:{ labels, datasets:[{ data:values, borderColor:'#C8FF00', backgroundColor:'rgba(200,255,0,0.04)', borderWidth:2, pointRadius:2, pointBackgroundColor:'#C8FF00', tension:0.3, fill:true }]}, options:chartOpts() }));
+    area.appendChild(card);
+  }
+  const barCol = numCols[1] || numCols[0];
+  if (barCol) {
+    const card = mkCard(`РАСПРЕДЕЛЕНИЕ: ${barCol.toUpperCase()}`);
+    const ctx = card.querySelector('canvas').getContext('2d');
+    const labels = csvData.slice(0,15).map((r,i) => txtCols[0] ? String(r[txtCols[0]]).slice(0,10) : `#${i+1}`);
+    const values = csvData.slice(0,15).map(r => r[barCol]);
+    const max = Math.max(...values.filter(Boolean));
+    chartInstances.push(new Chart(ctx, { type:'bar', data:{ labels, datasets:[{ data:values, backgroundColor: values.map(v => v===max?'#C8FF00':'rgba(200,255,0,0.22)'), borderWidth:0 }]}, options:chartOpts() }));
+    area.appendChild(card);
+  }
+  if (txtCols[0] && numCols[0]) {
+    const card = mkCard(`ТОП по ${txtCols[0].toUpperCase()}`);
+    const ctx = card.querySelector('canvas').getContext('2d');
+    const grouped = {};
+    csvData.forEach(r => {
+      const k = String(r[txtCols[0]]).slice(0,15);
+      grouped[k] = (grouped[k]||0) + (parseFloat(r[numCols[0]])||0);
+    });
+    const sorted = Object.entries(grouped).sort((a,b)=>b[1]-a[1]).slice(0,8);
+    chartInstances.push(new Chart(ctx, { type:'bar', data:{ labels:sorted.map(s=>s[0]), datasets:[{ data:sorted.map(s=>s[1]), backgroundColor:'rgba(232,75,26,0.6)', borderColor:'#E84B1A', borderWidth:1 }]}, options:{...chartOpts(), indexAxis:'y'} }));
+    area.appendChild(card);
+  }
+}
+
+function mkCard(title, cls='') {
+  const c = document.createElement('div');
+  c.className = 'chart-card' + (cls?' '+cls:'');
+  c.innerHTML = `<div class="chart-title">${title}</div><canvas></canvas>`;
+  return c;
+}
+function chartOpts() {
+  return {
+    responsive:true, maintainAspectRatio:true,
+    plugins:{ legend:{display:false}, tooltip:{ backgroundColor:'#1A1A1A', borderColor:'#333', borderWidth:1, titleColor:'#C8FF00', bodyColor:'#F5F0E8', titleFont:{family:'DM Mono',size:10}, bodyFont:{family:'DM Sans',size:11} }},
+    scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'rgba(245,240,232,0.35)',font:{size:9,family:'DM Mono'},maxRotation:30}}, y:{grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'rgba(245,240,232,0.35)',font:{size:9,family:'DM Mono'}}} }
+  };
+}
+
+function updateChips() {
+  const numCols = getNumCols();
+  const txtCols = getTxtCols();
+  const chips = document.querySelectorAll('.chip');
+  if (chips[0] && numCols[0]) chips[0].textContent = `Сумма, среднее, мин/макс по ${numCols[0]}`;
+  if (chips[1] && txtCols[0] && numCols[0]) chips[1].textContent = `Топ-5 по ${txtCols[0]} на основе ${numCols[0]}`;
+  if (chips[2]) chips[2].textContent = 'Найди выбросы и аномалии в данных';
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────────
+function askChip(btn) { document.getElementById('chat-input').value = btn.textContent; sendMessage(); }
+document.getElementById('chat-input').addEventListener('keydown', e => { if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();sendMessage();} });
+
+async function sendMessage() {
+  if (isSending) return;
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+  if (!csvData.length) { addMsg('ai', '⚠️ Сначала загрузи CSV файл.'); return; }
+
+  input.value = '';
+  isSending = true;
+  document.getElementById('send-btn').disabled = true;
+  addMsg('user', text);
+  showTyping();
+
+  const numCols = getNumCols();
+  const txtCols = getTxtCols();
+
+  // Статистика (вычисляется в браузере)
+  const statsLines = numCols.map(col => {
+    const vals = csvData.map(r => parseFloat(r[col])).filter(v => !isNaN(v));
+    if (!vals.length) return null;
+    const sum = vals.reduce((a,b)=>a+b,0);
+    const avg = sum/vals.length;
+    const sorted = [...vals].sort((a,b)=>a-b);
+    return `${col}: count=${vals.length}, sum=${sum.toFixed(2)}, avg=${avg.toFixed(2)}, min=${sorted[0]}, max=${sorted[sorted.length-1]}`;
+  }).filter(Boolean).join('\n');
+
+  try {
+    const res = await fetch(API + '/data/analyze', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${authToken}`
+      },
+      body: JSON.stringify({
+        message: text,
+        csv_sample: csvData.slice(0, 5),
+        headers: csvHeaders,
+        num_cols: numCols,
+        txt_cols: txtCols,
+        stats_text: statsLines,
+        total_rows: csvData.length
+      })
+    });
+
+    hideTyping();
+
+    if (res.status === 401) {
+      addMsg('ai', '⚠️ Сессия истекла. Войди снова.');
+      setTimeout(() => { window.location.href = '/'; }, 2000);
+      return;
+    }
+    if (res.status === 403) {
+      const d = await res.json();
+      addMsg('ai', `⚠️ ${d.detail}`);
+      return;
+    }
+
+    const data = await res.json();
+    processResponse(data.answer);
+
+  } catch(err) {
+    hideTyping();
+    addMsg('ai', `⚠️ Ошибка подключения: ${err.message}`);
+  }
+
+  isSending = false;
+  document.getElementById('send-btn').disabled = false;
+}
+
+// ── RESPONSE PROCESSOR ────────────────────────────────────────────────────────
+function processResponse(raw) {
+  if (!raw || typeof raw !== 'string' || raw.trim() === '') {
+    addMsg('ai', '⚠️ Пустой ответ. Попробуй переформулировать вопрос.');
+    return;
+  }
+  const codeMatch = raw.match(/```(?:javascript|js)?\s*([\s\S]*?)```/);
+  if (codeMatch && codeMatch[1] && codeMatch[1].trim()) {
+    executeCode(codeMatch[1].trim());
+  } else {
+    addMsg('ai', raw);
+  }
+}
+
+function executeCode(code) {
+  try {
+    const fn = new Function('csvData', 'csvHeaders', `
+      ${code}
+      if (typeof analyze === 'function') return analyze(csvData, csvHeaders);
+      return 'Код выполнен, но функция analyze() не найдена.';
+    `);
+    const result = fn(csvData, csvHeaders);
+    showResult(result);
+    addMsg('ai', `✓ Код выполнен на ${csvData.length} строках.\n\n**Результат:**\n${result}`);
+  } catch(err) {
+    addMsg('ai', `⚠️ Ошибка выполнения кода: ${err.message}`);
+  }
+}
+
+function showResult(text) {
+  const area = document.getElementById('charts-area');
+  area.querySelectorAll('.result-card').forEach(c => c.remove());
+  const card = document.createElement('div');
+  card.className = 'result-card';
+  card.innerHTML = `<div class="result-card-title">◆ РЕЗУЛЬТАТ ВЫЧИСЛЕНИЯ</div><div class="result-value">${text}</div>`;
+  area.prepend(card);
+}
+
+// ── CHAT HELPERS ──────────────────────────────────────────────────────────────
+function addMsg(role, text) {
+  const container = document.getElementById('chat-messages');
+  const div = document.createElement('div');
+  div.className = `msg ${role}`;
+  const now = new Date().toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+  const formatted = text.replace(/\*\*(.*?)\*\*/g,'<b>$1</b>').replace(/\n/g,'<br>');
+  div.innerHTML = `<div class="msg-bubble">${formatted}</div><div class="msg-time">${now}</div>`;
+  container.appendChild(div);
+  container.scrollTop = container.scrollHeight;
+}
+
+function showTyping() {
+  const c = document.getElementById('chat-messages');
+  const d = document.createElement('div');
+  d.className = 'msg ai'; d.id = 'typing';
+  d.innerHTML = `<div class="typing-indicator"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>`;
+  c.appendChild(d); c.scrollTop = c.scrollHeight;
+}
+function hideTyping() { const t = document.getElementById('typing'); if(t) t.remove(); }
+</script>
+</body>
+</html>
