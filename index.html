@@ -1377,9 +1377,9 @@ function closeAuth() {
 }
 function switchTab(tab) {
   document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
-  document.querySelector(`.auth-tab[data-tab="${tab}"]`)?.classList.add('active');
-  document.getElementById(`${tab}-form`)?.classList.add('active');
+  document.getElementById('tab-' + tab)?.classList.add('active');
+  document.getElementById('login-form').style.display = tab === 'login' ? 'block' : 'none';
+  document.getElementById('register-form').style.display = tab === 'register' ? 'block' : 'none';
 }
 document.addEventListener('click', e => {
   if (e.target.id === 'auth-overlay') closeAuth();
