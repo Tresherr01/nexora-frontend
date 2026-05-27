@@ -1043,8 +1043,6 @@ function setLang(lang) {
 
 const currencyData = {
   usd: { starter: '$0', business: '$49' },
-  eur: { starter: '€0', business: '€45' },
-  uah: { starter: '₴0', business: '₴1 990' },
 };
 
 function setCurrency(currency) {
@@ -1160,17 +1158,15 @@ async function autoDetectRegion() {
     const country = geo.country_code;
 
     if (country === 'UA') {
-      setLang('uk'); setCurrency('uah');
-    } else if (['US','CA','AU'].includes(country)) {
-      setLang('en'); setCurrency('usd');
+      setLang('uk'); setCurrency('usd');
     } else if (euCountries.includes(country)) {
-      setLang('en'); setCurrency('eur');
+      setLang('en'); setCurrency('usd');
     } else {
       setLang('en'); setCurrency('usd');
     }
   } catch {
     const lang = (navigator.language || 'en').toLowerCase();
-    if (lang.startsWith('uk')) { setLang('uk'); setCurrency('uah'); }
+    if (lang.startsWith('uk')) { setLang('uk'); setCurrency('usd'); }
     else if (lang.startsWith('ru')) { setLang('ru'); setCurrency('usd'); }
     else { setLang('en'); setCurrency('usd'); }
   }
