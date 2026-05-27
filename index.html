@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -1147,32 +1147,7 @@ if (wlInput) wlInput.addEventListener('keydown', e => { if(e.key==='Enter') subm
 const origSetLang = window.setLang;
 
 // ── AUTO DETECT LANGUAGE & CURRENCY BY REGION ────────────────────────────
-async function autoDetectRegion() {
-  const euCountries = ['AT','BE','BG','HR','CY','CZ','DK','EE','FI','FR','DE',
-    'GR','HU','IE','IT','LV','LT','LU','MT','NL','PL','PT','RO','SK','SI',
-    'ES','SE','NO','CH','GB','IS','LI','AL','BA','ME','MK','RS','TR'];
-
-  try {
-    const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(3000) });
-    const geo = await res.json();
-    const country = geo.country_code;
-
-    if (country === 'UA') {
-      setLang('uk'); setCurrency('usd');
-    } else if (euCountries.includes(country)) {
-      setLang('en'); setCurrency('usd');
-    } else {
-      setLang('en'); setCurrency('usd');
-    }
-  } catch {
-    const lang = (navigator.language || 'en').toLowerCase();
-    if (lang.startsWith('uk')) { setLang('uk'); setCurrency('usd'); }
-    else if (lang.startsWith('ru')) { setLang('ru'); setCurrency('usd'); }
-    else { setLang('en'); setCurrency('usd'); }
-  }
-}
-
-autoDetectRegion();
+setLang('en'); setCurrency('usd');
 
 
 // ── AUTH ─────────────────────────────────────────────────────────────────────
