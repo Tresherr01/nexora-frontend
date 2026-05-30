@@ -612,7 +612,7 @@
   </ul>
   
 
-  <div id="nav-auth-area"><button class="btn-nav-auth" onclick="openAuth('login')">Войти</button></div>
+  <div id="nav-auth-area"><button class="btn-nav-auth" onclick="openAuth('login')">Sign in</button></div>
 </nav>
 
 <!-- HERO -->
@@ -712,7 +712,7 @@
       <span class="feature-num">02</span>
       <div class="feature-icon">⚡</div>
       <div class="feature-name">Авто-дашборды</div>
-      <p class="feature-desc">Загрузи CSV или подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.</p>
+      <p class="feature-desc">Загрузи CSV or подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.</p>
     </div>
     <div class="feature-card reveal">
       <span class="feature-num">03</span>
@@ -833,7 +833,7 @@ const translations = {
     'feature-names': ['AI-аналитик','Авто-дашборды','Прогнозирование','100+ интеграций','Безопасность','Командная работа'],
     'feature-descs': [
       'Задавай вопросы к данным на русском языке. Получай ответы с визуализацией за секунды, как у ChatGPT, но про твой бизнес.',
-      'Загрузи CSV или подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.',
+      'Загрузи CSV or подключи CRM — система сама построит ключевые метрики, тренды и аномалии. Без настройки.',
       'ML-модели строят прогнозы продаж, оттока клиентов и спроса. Настраивается под твой рынок за один клик.',
       'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — подключаем всё где живут твои данные. API за 15 минут.',
       'Данные не покидают твой контур. Европейский дата-центр, GDPR, SOC2 в процессе. Enterprise-уровень для любого тарифа.',
@@ -917,7 +917,7 @@ const translations = {
       'Став питання до даних українською мовою. Отримуй відповіді з візуалізацією за секунди — як ChatGPT, але про твій бізнес.',
       'Завантаж CSV або підключи CRM — система сама побудує ключові метрики, тренди та аномалії. Без налаштувань.',
       'ML-моделі будують прогнози продажів, відтоку клієнтів та попиту. Налаштовується під твій ринок за один клік.',
-      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — підключаємо всюди де живуть твої дані. API за 15 хвилин.',
+      'Salesforce, HubSpot, Google Sheets, Postgres, Stripe — підключаємо всюди де живуть твої дані. API за 15 хвorн.',
       'Дані не покидають твій контур. SOC2 в процесі. Enterprise-рівень безпеки для будь-якого тарифу.',
       'Ділись дашбордами з командою, ставь завдання на інсайти, експортуй PDF-звіти з брендингом в один клік.'
     ],
@@ -1283,8 +1283,8 @@ updateNavAuth();
     <div class="auth-logo">NEXORA</div>
 
     <div class="auth-tabs">
-      <button class="auth-tab active" id="tab-login" data-tab="login" onclick="switchTab('login')">Войти</button>
-<button class="auth-tab" id="tab-register" data-tab="register" onclick="switchTab('register')">Регистрация</button>
+      <button class="auth-tab active" id="tab-login" data-tab="login" onclick="switchTab('login')">Sign in</button>
+<button class="auth-tab" id="tab-register" data-tab="register" onclick="switchTab('register')">Sign up</button>
     </div>
 
     <!-- LOGIN FORM -->
@@ -1301,17 +1301,17 @@ updateNavAuth();
         <span id="login-btn-text">Войти →</span>
       </button>
       <div class="auth-msg" id="login-msg"></div>
-      <div class="auth-divider">или</div>
+      <div class="auth-divider">or</div>
       <div style="text-align:center; font-size:13px; color:rgba(245,240,232,0.4);">
-        Нет аккаунта? <a href="#" onclick="switchTab('register')" style="color:var(--acid);">Зарегистрироваться</a>
+        No account? <a href="#" onclick="switchTab('register')" style="color:var(--acid);">Sign up</a>
       </div>
     </div>
 
     <!-- REGISTER FORM -->
     <div id="register-form" style="display:none;">
       <div class="auth-field">
-        <label class="auth-label">Имя</label>
-        <input type="text" class="auth-input" id="reg-name" placeholder="Ваше имя" />
+        <label class="auth-label">Name</label>
+        <input type="text" class="auth-input" id="reg-name" placeholder="Your name" />
       </div>
       <div class="auth-field">
         <label class="auth-label">Email</label>
@@ -1325,9 +1325,9 @@ updateNavAuth();
         <span id="reg-btn-text">Создать аккаунт →</span>
       </button>
       <div class="auth-msg" id="reg-msg"></div>
-      <div class="auth-divider">или</div>
+      <div class="auth-divider">or</div>
       <div style="text-align:center; font-size:13px; color:rgba(245,240,232,0.4);">
-        Уже есть аккаунт? <a href="#" onclick="switchTab('login')" style="color:var(--acid);">Войти</a>
+        Already have an account? <a href="#" onclick="switchTab('login')" style="color:var(--acid);">Sign in</a>
       </div>
     </div>
   </div>
